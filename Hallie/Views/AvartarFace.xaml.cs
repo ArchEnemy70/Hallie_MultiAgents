@@ -42,6 +42,7 @@ namespace Hallie.Views
 
                 // Configurer le titre de la fenêtre
                 var title = Params.AvatarName ?? "Hallie";
+                title += " MultiAgents";
                 title += $" - {_viewModel.NumVersion}";
     #if DEBUG
                 title += " - DEV";
