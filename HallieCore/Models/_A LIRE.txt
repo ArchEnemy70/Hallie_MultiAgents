@@ -1,0 +1,8 @@
+ggml-base.bin : modèle pour Whisper.NET (https://huggingface.co/ggerganov/whisper.cpp/tree/main)
+model.onnx + tokenizer.json : modele & json pour BgeReranker 
+
+FaceRecognition
+ - face_detection_yunet_2023mar.onnx
+ - haarcascade_frontalface_alt.xml
+ - haarcascade_frontalface_default.xml
+ - model_reconnaissance.yml

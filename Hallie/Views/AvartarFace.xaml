@@ -1,0 +1,160 @@
+﻿<Window x:Class="Hallie.Views.AvatarFace"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hallie.Views"
+        xmlns:vm="clr-namespace:Hallie.ViewModels"
+        mc:Ignorable="d"
+        Title="AvatarFace" 
+        Height="470" Width="650"     
+        MinHeight="150" MinWidth="250"     
+        AllowsTransparency="False"
+        Background="White"
+        ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="True">
+
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        <local:MicIconConverter x:Key="MicIconConverter"/>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding LireTextSaisiCommand}"/>
+    </Window.InputBindings>
+    <Grid Background="Transparent">
+        <Menu Grid.Row="0" Background="White">
+            <MenuItem x:Name="Mnu_Conversations" Header="Conversations" Width="100">
+                <MenuItem x:Name="Mnu_NewConv" Header="Nouvelle" Click="Mnu_NewConv_Click"/>
+                <MenuItem x:Name="Mnu_HistoriqueConv" Header="Historique" Click="Mnu_HistoriqueConv_Click"/>
+                <MenuItem x:Name="Mnu_Raccourcis" Header="Raccourcis" Click="Mnu_Raccourcis_Click" />
+                <MenuItem x:Name="Mnu_Outils" Header="Outils" Click="Mnu_Outils_Click" />
+            </MenuItem>
+        </Menu>
+        <!-- Images d'états avec opacité bindée -->
+        <Image Source="/img/Waiting.png"
+               Opacity="{Binding WaitingOpacity}"/>
+
+        <Image Source="/img/Listening.png"
+               Opacity="{Binding ListeningOpacity}"/>
+
+        <Image Source="/img/Speaking.png"
+               Opacity="{Binding SpeakingOpacity}"/>
+
+        <Image Source="/img/Speaking2.png"
+               Opacity="{Binding Speaking2Opacity}"/>
+
+        <Image Source="/img/Thinking.png"
+               Opacity="{Binding ThinkingOpacity}"/>
+
+        <Image Source="/img/Interrupted.png"
+               Opacity="{Binding InterruptedOpacity}"/>
+
+        <!-- État textuel -->
+        <TextBlock Text="{Binding State}" 
+                   FontSize="16" 
+                   Foreground="Purple"
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Top" 
+                   Margin="10,42,0,0" 
+                   Width="200"/>
+
+        <!-- Description Tools -->
+        <TextBlock Text="{Binding ToolsDescription}" 
+                   FontSize="8" 
+                   Foreground="Purple"
+                   HorizontalAlignment="Right" 
+                   VerticalAlignment="Top" 
+                   Margin="0,10,0,0" 
+                   Width="123" Height="315"/>
+
+        <!-- Outil sélectionné -->
+        <TextBlock Text="{Binding OutilUsed}" 
+                   FontSize="12" 
+                   Foreground="DarkMagenta"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Top" 
+                   Margin="10,68,0,0" 
+                   Width="169" Height="67"/>
+
+        <!-- Bouton Micro avec icône dynamique -->
+        <Button Command="{Binding ToggleMicCommand}"
+                FontSize="22"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                ToolTip="Activer/Désactiver le microphone" Width="34" Height="34" Margin="0,0,18,90" RenderTransformOrigin="0.537,-0.588">
+            <TextBlock Text="{Binding IsMicOn, Converter={StaticResource MicIconConverter}}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Button>
+
+        <!-- Bouton RAZ avec commande bindée -->
+        <Button Content="🔄"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Command="{Binding ResetCommand}"
+                ToolTip="Réinitialiser" 
+                Width="34" Height="28" Margin="0,0,18,60"/>
+
+        <Button Content="⛶"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                ToolTip="Agrandir la zone de prompt" 
+                Width="34" Height="22" Margin="0,0,18,36" Click="Button_Click"/>
+
+        <!-- Feedback utilisateur (amélioration du routage) -->
+        <Border HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,12,6"
+                Padding="6"
+                CornerRadius="6"
+                Visibility="{Binding CanSendFeedback, Converter={StaticResource BoolToVisibility}}"
+                Background="#11AAAAAA">
+            <StackPanel Margin="0,0,0,0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <!-- Ligne 1 : commentaire + note + actions -->
+
+                    <Button Content="👍"
+                            Width="34" Height="22"
+                            Margin="0,0,5,0"
+                            ToolTip="Valider (solved)"
+                            Click="Button_Click_2"
+                            IsEnabled="{Binding CanSendFeedback}"/>
+
+                    <Button Content="👎"
+                            Width="34" Height="22"
+                            ToolTip="Signaler un problème (failed)"
+                            Click="Button_Click_1"
+                            IsEnabled="{Binding CanSendFeedback}"/>
+
+
+
+
+            </StackPanel>
+        </Border>
+
+        <TextBox
+            Text="{Binding TxtSaisi, UpdateSourceTrigger=PropertyChanged}"
+            BorderThickness="0"
+            Foreground="LightGreen"
+            FontSize="10"
+            Margin="10,10,100,10"
+            Height="25"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto"
+            VerticalAlignment="Bottom"
+            FontWeight="Bold">
+
+            <TextBox.Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="Black"/>
+                    <Setter Property="ToolTip" Value="CTRL + ENTREE pour exécuter la commande"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text.Length, RelativeSource={RelativeSource Self}}" Value="0">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="ToolTip" Value="Vous pouvez saisir une commande ici..."/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+
+    </Grid>
+</Window>

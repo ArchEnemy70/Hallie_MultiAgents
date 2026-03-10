@@ -1,0 +1,3 @@
+﻿va sur la page web "https://rmcsport.bfmtv.com/rugby/tournoi-des-6-nations/classement/" 
+et extrait la table qui s'y trouve. 
+Avec ces données, tu génères un fichier excel

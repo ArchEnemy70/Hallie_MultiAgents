@@ -1,0 +1,2 @@
+﻿D:\_TrainingData\FaceRecognition\TrainSet
+D:\_TrainingData\FaceRecognition\TestSet

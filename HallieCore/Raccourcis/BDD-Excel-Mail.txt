@@ -1,0 +1,3 @@
+Quels sont les salariés qui étaient en congé en décembre 2025 ?
+Ensuite génère un fichier Excel avec ces données.
+Ensuite envoie ce fichier par mail à yann@gmail.com (sujet du mail : "Absences 2025/12", corps du texte : "Bonne réception")

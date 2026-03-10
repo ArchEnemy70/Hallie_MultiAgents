@@ -1,0 +1,22 @@
+﻿<Window x:Class="Hallie.Views.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hallie.Views"
+        mc:Ignorable="d"
+        Title="Saisie"
+        Height="150"
+        Width="300"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize" Background="#FFF0F0F0">
+    <StackPanel Margin="15">
+        <TextBlock x:Name="Titre" Text="Entrez votre valeur :" />
+        <TextBox x:Name="InputTextBox" Margin="0,10,0,10"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="OK" Width="70" Margin="5" Click="Ok_Click"/>
+            <Button Content="Annuler" Width="70" Margin="5" Click="Cancel_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
+

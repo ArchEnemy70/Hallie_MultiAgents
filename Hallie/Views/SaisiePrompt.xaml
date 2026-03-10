@@ -1,0 +1,35 @@
+﻿<Window x:Class="Hallie.Views.SaisiePrompt"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Hallie.ViewModels"
+        xmlns:local="clr-namespace:Hallie.Views"
+        mc:Ignorable="d"
+        Title="Saisie du Prompt" Height="465" Width="800" ResizeMode="NoResize">
+    <Grid>
+        <TextBox
+            Text="{Binding TxtSaisi, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}"
+            BorderThickness="0"
+            Foreground="LightGreen"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto"
+            FontSize="12"
+            Margin="5,5,5,0"
+            VerticalAlignment="Top"
+            FontWeight="Bold" 
+            PreviewKeyDown="TextBox_PreviewKeyDown" Height="381"
+            ToolTip="CTRL + ENTREE pour exécuter la commande"
+            Background="Black">
+            <TextBox.InputBindings>
+                <KeyBinding  Key="Enter" Modifiers="Control" Command="{Binding LireTextSaisiCommand}" />
+            </TextBox.InputBindings>
+        </TextBox>
+        <Button Content="🚪" 
+                ToolTip="Fermer" 
+                HorizontalAlignment="Right" Height="25" Margin="0,0,5,15" 
+                VerticalAlignment="Bottom" Width="30" Click="Button_Click"/>
+
+    </Grid>
+</Window>

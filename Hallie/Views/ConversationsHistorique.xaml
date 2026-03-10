@@ -1,0 +1,161 @@
+﻿<Window x:Class="Hallie.Views.ConversationsHistorique"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hallie.Views"
+        mc:Ignorable="d"
+        Title="Historique des Conversations" Height="430" Width="800">
+
+    <Window.Resources>
+        <local:RoleToColorConverter x:Key="RoleToColorConverter" />
+        <local:RoleToColorTextConverter x:Key="RoleToColorTextConverter" />
+        <local:RoleToAlignmentConverter x:Key="RoleToAlignmentConverter" />
+        <local:RoleToIconConverter x:Key="RoleToIconConverter" />
+        <Style x:Key="ChatBubbleStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="MaxWidth" Value="700" />
+        </Style>
+        <DropShadowEffect x:Key="ShadowEffect"
+                  BlurRadius="8"
+                  ShadowDepth="2"
+                  Opacity="0.4"
+                  Direction="270"/>
+    </Window.Resources>
+
+    <DockPanel>
+
+        <!-- Barre supérieure avec les 3 boutons côte à côte -->
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="5">
+            <!-- Bouton de suppression des conversations -->
+            <Button x:Name="BtnDeleteConv"  Style="{DynamicResource ButtonStyle}" Content="🗑" Width="74" Click="BtnDeleteConv_Click" Margin="0,0,20,0" Height="35" ToolTip="Supprimer la conversation sélectionnée" />
+            <!-- Bouton pour créer une nouveau conversation -->
+            <Button x:Name="BtnSelectConv"  Style="{DynamicResource ButtonStyle}" Content="Selection conversation" Width="138" Click="BtnSelectConv_Click" Margin="150,0,10,0" Height="35" ToolTip="Sélectionner la conversation"/>
+            <Button x:Name="BtnEditConv"  Style="{DynamicResource ButtonStyle}" Content="Ouvrir le fichier conversation" Width="170" Click="BtnEditConv_Click" Margin="0,0,0,0" Height="35" ToolTip="Sélectionner la conversation"/>
+            <!-- Liste déroulante des modèles disponibles -->
+
+        </StackPanel>
+
+        <Popup x:Name="ToastPopup"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=MainGrid}" 
+               StaysOpen="False"
+               AllowsTransparency="True"
+               PopupAnimation="Fade"
+               HorizontalOffset="0"
+               VerticalOffset="-30">
+
+            <Border Background="#FF323232"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="10"
+                    Effect="{DynamicResource ShadowEffect}">
+                <TextBlock x:Name="ToastMessage"
+                           Foreground="White"
+                           FontWeight="Bold"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           MaxWidth="300"/>
+            </Border>
+        </Popup>
+        <!-- Contenu principal en deux colonnes -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Margin="0">
+                <Grid.RowDefinitions>
+                    <!-- Liste des conversations -->
+                    <RowDefinition Height="*"/>
+
+                </Grid.RowDefinitions>
+                <!-- Liste des conversations -->
+                <ListBox Grid.Row="0" Style="{DynamicResource SimpleListBox}"
+                        ItemsSource="{Binding Conversations}"
+                        SelectedItem="{Binding SelectedConversation}"
+                        SelectionChanged="OnConversationSelected"
+                         Width="290"
+                        Margin="5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Title}"   
+                                ToolTip="{Binding TitleLong}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Bouton Selectionner des images -->
+                <!-- Liste des images sélectionnées -->
+                <!-- Bouton Supprimer une image -->
+            </Grid>
+
+            <!-- Zone de chat -->
+            <Grid Grid.Column="1" Margin="5">
+                <Grid.RowDefinitions>
+                    <!-- historique de la conversation -->
+                    <RowDefinition Height="*" />
+                    <!-- saisie -->
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- historique de la conversation -->
+                <ScrollViewer x:Name="ChatScrollViewer"
+                                VerticalScrollBarVisibility="Auto"
+                                HorizontalScrollBarVisibility="Disabled"
+                                ScrollChanged="ChatScrollViewer_ScrollChanged">
+                    <ItemsControl ItemsSource="{Binding CurrentMessages}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel HorizontalAlignment="{Binding Role, Converter={StaticResource RoleToAlignmentConverter}}">
+
+                                    <!-- Icône rôle -->
+                                    <TextBlock Text="{Binding Role, Converter={StaticResource RoleToIconConverter}}"
+                                                FontSize="18"
+                                                VerticalAlignment="Top"
+                                                Margin="5 0 5 0" />
+
+                                    <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
+                                        <TextBlock Text="{Binding Tool}"
+                                                FontSize="8"
+                                                Margin="5 0 0 0" />
+
+                                        <!-- Bulle -->
+                                        <Border Style="{StaticResource ChatBubbleStyle}"
+                                            Background="{Binding Role, Converter={StaticResource RoleToColorConverter}}"
+                                            HorizontalAlignment="{Binding Role, Converter={StaticResource RoleToAlignmentConverter}}">
+                                            <TextBlock Text="{Binding Content}"
+                                               Foreground="{Binding Role, Converter={StaticResource RoleToColorTextConverter}}"
+                                               TextWrapping="Wrap"
+                                               TextTrimming="None"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Top" 
+                                               ToolTip="{Binding Model}"
+                                               x:Name="TxtMessage">
+                                                <TextBlock.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Copier" Click="CopierMenuItem_Click"/>
+                                                    </ContextMenu>
+                                                </TextBlock.ContextMenu>
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

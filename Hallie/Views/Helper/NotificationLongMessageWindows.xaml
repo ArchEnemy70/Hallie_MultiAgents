@@ -1,0 +1,35 @@
+﻿<Window x:Class="Hallie.Views.Helper.NotificationLongMessageWindows"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hallie.Views.Helper"
+        mc:Ignorable="d"
+        Title="NotificationLongMessageWindows" Height="480" Width="800"
+        Background="Black">
+    <Grid>
+        <TextBox x:Name="Message"
+            Text="..."
+            BorderThickness="0"
+            Foreground="White"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto"
+            FontSize="12"
+            Margin="5,5,5,0"
+            VerticalAlignment="Top"
+            FontWeight="Bold" 
+            Height="381"
+            Background="Black">
+        </TextBox>
+        <Button Content="Fermer" 
+                ToolTip="Fermer" 
+                HorizontalAlignment="Right" Height="25" Margin="0,0,5,15" 
+                VerticalAlignment="Bottom" Width="50" Click="Button_Click"/>
+        <Button Content="Editer" 
+                ToolTip="Editer la réponse" 
+                HorizontalAlignment="Right" Height="25" Margin="0,0,65,15" 
+                VerticalAlignment="Bottom" Width="50" Click="Edit_Click"/>
+
+    </Grid>
+</Window>
