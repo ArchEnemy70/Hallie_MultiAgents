@@ -50,7 +50,6 @@ namespace Hallie.Services
         Basic,
         WithTools,
         SuperviseurAgent, 
-        RouterAgent,
         PlannerAgent,
         CriticAgent,
         SqlQueryOnly,
@@ -198,9 +197,7 @@ namespace Hallie.Services
                 toolCallTrace: (toolName, parametersJson) => LastExecutedToolCalls.Add(new ToolCallTrace(toolName, parametersJson))
             );
 
-            var rp = GetPrompt(ePrompts.RouterAgent);
-            var pp = GetPrompt(ePrompts.PlannerAgent);
-            var plannerPrompt = rp + "\n" + pp; 
+            var plannerPrompt = GetPrompt(ePrompts.PlannerAgent);
             var execution = await coordinator.ExecuteAsync(userPrompt, history, plannerPrompt);
 
             LoggerService.LogDebug($"OllamaClient.GenerateWithToolsAsync --> nb.steps={execution.Plan.Plan.Count} why={execution.Plan.Why}");
@@ -1302,12 +1299,7 @@ namespace Hallie.Services
             var fileName = "";
             var prompt = "";
 
-            if (eprompt == ePrompts.RouterAgent)
-            {
-                fileName = "Prompt_RouterAgent.txt";
-                prompt = GetPromptRouterAgent();
-            }
-            else if (eprompt == ePrompts.PlannerAgent)
+            if (eprompt == ePrompts.PlannerAgent)
             {
                 fileName = "Prompt_PlannerAgent.txt";
                 prompt = GetPromptPlannerAgent();
@@ -1536,55 +1528,44 @@ namespace Hallie.Services
                 """;
 
         }
-        private static string GetPromptRouterAgent()
+        private static string GetPromptPlannerAgent()
         {
-            return $$"""
-                Tu es un routeur d’outils. Ta seule mission est de choisir l’outil le plus approprié, ou aucun.
+            return $$$"""
+                Tu es le planner d'un système multi-agents.
+                Ta mission est de construire le plan complet d'outils à exécuter pour satisfaire la demande utilisateur.
+                Tu ne rédiges jamais la réponse finale.
+                Tu ne fais pas de commentaire hors JSON.
+                Tu réponds UNIQUEMENT avec un JSON valide.
 
                 Règles absolues :
-                - Tu réponds UNIQUEMENT par un JSON valide. Aucun texte avant ou après.
-                - Si aucun outil n’est nécessaire, renvoie exactement :
-                  {"plan": [{ "tool": "none", "parameters": {} }], "why": "culture générale" }
+                - Si aucun outil n'est nécessaire, renvoie exactement :
+                  {"plan":[{"tool":"none","parameters":{}}],"why":"culture générale"}
+                - Si la demande contient plusieurs actions explicites, le plan doit contenir toutes les étapes nécessaires.
+                - Ne retourne jamais un plan partiel si la demande est explicitement multi-étapes.
+                - Si l'utilisateur exprime explicitement une séquence avec "ensuite", "puis", "après",
+                  tu dois respecter cet ordre dans le champ plan.
+                - Tu n'as pas le droit de réordonner les étapes pour les rendre "plus logiques",
+                  sauf si l'ordre demandé est techniquement impossible.
+                - Si une étape dépend d'un artefact non encore créé, tu dois en tenir compte.
+                - Le plan doit être exécutable, cohérent et ordonné.
 
                 Outils disponibles :
                 {_toolRegistry_GetToolsDescription}
 
                 Règles de choix :
-                - plan vide si aucun outil
                 - Préfère search_documents à web_search pour toute question interne entreprise.
                 - N’utilise web_search que si l’information est clairement externe.
-                - N’utilise sql_query que si la question demande des données chiffrées/liste/filtrage venant de la base.
-                - Si la question demande à la fois des données SQL et un fichier (Excel/Word/PPT), choisis d’abord sql_query.
-                - Si tu as besoin de plusieurs outils, crée un tableau de plan avec l’ordre d’utilisation (ex : sql_query puis create_bureatique_file).
-                
-                Si l'utilisateur exprime explicitement une séquence avec "ensuite", "puis", "après",
-                tu dois respecter cet ordre dans le champ plan.
-                Tu n'as pas le droit de réordonner les étapes pour les rendre "plus logiques"
-                sauf si l'ordre demandé est techniquement impossible.
+                - N’utilise sql_query que si la question demande des données chiffrées, une liste, un filtrage ou une extraction depuis la base.
+                - Si une demande inclut des données SQL puis un fichier, utilise d'abord sql_query.
+                - Si une demande inclut plusieurs outils, retourne toutes les étapes dans l'ordre réel d'exécution.
 
                 Format obligatoire :
                 {
-                  "plan": 
-                  [
-                    { "tool": "nom_outil_ou_none", "parameters": {  } }
+                  "plan": [
+                    { "tool": "nom_outil_ou_none", "parameters": {} }
                   ],
                   "why": "raison courte"
                 }
-                
-                """;
-        }
-        private static string GetPromptPlannerAgent()
-        {
-            return $$"""
-                Tu es le planner d'un système multi-agents. 
-                Tu décides uniquement du plan d'outils à exécuter. 
-                Ne rédige jamais la réponse finale utilisateur. 
-                Renvoie strictement le JSON attendu avec why et plan.
-                Le planner dispose d'une mémoire persistée SQL Server quand la connexion est configurée.
-
-                Si la demande contient plusieurs actions explicites (ex: récupérer des données, créer un fichier, envoyer un mail), le champ plan doit contenir toutes les étapes nécessaires, dans l’ordre.
-                Ne retourne jamais un plan partiel si la demande est explicitement multi-étapes.
-                
                 """;
         }
         private static string GetPromptSuperviseurAgent()

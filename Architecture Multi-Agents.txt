@@ -1,0 +1,173 @@
+UTILISATEUR
+│
+│  Prompt utilisateur
+│
+▼
+PLANNER AGENT
+│
+├─ Rôle
+│   Construire le plan d’exécution complet.
+│
+├─ Entrées
+│   - Prompt utilisateur
+│   - Description des outils disponibles
+│
+├─ Actions
+│   - Comprendre l’intention
+│   - Identifier les étapes nécessaires
+│   - Choisir les outils
+│   - Déterminer l’ordre d’exécution
+│
+├─ Contraintes
+│   - Respecter l’ordre explicite du prompt
+│   - Ne jamais retourner de texte libre
+│
+├─ Sortie attendue
+│   JSON
+│   {
+│     plan: [ ... ],
+│     why: "raison courte"
+│   }
+│
+▼
+BOUCLE D’EXECUTION (par étape)
+│
+│  Pour chaque step du plan
+│
+├─────────────────────────────────────
+│
+│
+▼
+SPECIALIST AGENT
+│
+├─ Rôle
+│   Traduire une étape du plan en appel d’outil concret.
+│
+├─ Entrées
+│   - ToolName
+│   - Parameters du plan
+│   - Prompt spécialisé de l’outil
+│   - Résultats précédents
+│
+├─ Actions
+│   - Compléter les paramètres
+│   - Adapter les données
+│   - Générer l’appel outil final
+│
+├─ Sortie
+│   JSON
+│   {
+│     tool: "...",
+│     parameters: {...}
+│   }
+│
+▼
+SUPERVISOR (PRE-EXECUTE)
+│
+├─ Rôle
+│   Vérification rapide avant exécution.
+│
+├─ Entrées
+│   - ToolCall
+│   - Paramètres
+│   - Historique des étapes
+│
+├─ Actions
+│   - vérifier paramètres obligatoires
+│   - vérifier cohérence minimale
+│
+├─ Décisions possibles
+│
+│   continue
+│   replan
+│   stop
+│
+▼
+CRITIC AGENT
+│
+├─ Rôle
+│   Relecture intelligente de l’appel outil.
+│
+├─ Entrées
+│   - ToolCall proposé
+│   - Plan
+│   - Prompt utilisateur
+│
+├─ Actions
+│   - détecter incohérences
+│   - corriger paramètres
+│
+├─ Décisions
+│
+│   approve
+│   revise
+│   replan
+│
+├─ Sortie
+│   JSON
+│   {
+│     decision: "...",
+│     revisedParameters: {}
+│   }
+│
+▼
+EXECUTOR
+│
+├─ Rôle
+│   Exécuter réellement l’outil.
+│
+├─ Entrées
+│   - ToolName
+│   - Parameters
+│
+├─ Actions
+│   - appeler le service
+│   - récupérer le résultat
+│
+├─ Sortie
+│
+│   ToolResult
+│
+▼
+SUPERVISOR (POST-EXECUTE)
+│
+├─ Rôle
+│   Vérifier que l’exécution est exploitable.
+│
+├─ Entrées
+│   - ToolResult
+│
+├─ Décisions
+│
+│   continue
+│   replan
+│   stop
+│
+└─ si continue → étape suivante
+
+
+SYNTHESIZER / FINAL ANSWER
+│
+├─ Rôle
+│   Formuler la réponse utilisateur.
+│
+├─ Entrées
+│   - Résultats réels des outils
+│   - Prompt utilisateur
+│
+├─ Actions
+│   - résumer les résultats
+│   - expliquer les actions réalisées
+│
+└─ Sortie
+    Réponse utilisateur
+	
+	
+| Agent      | Type          | Ce qu'il fait         |
+| ---------- | ------------- | --------------------- |
+| Planner    | LLM           | construit le plan     |
+| Specialist | LLM           | prépare l'appel outil |
+| Executor   | code          | exécute l'outil       |
+| Critic     | LLM           | valide l'appel        |
+| Supervisor | LLM           | contrôle              |
+	
