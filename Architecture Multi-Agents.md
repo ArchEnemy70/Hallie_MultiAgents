@@ -297,7 +297,7 @@ SYSTÈME MULTI-AGENTS
 
 ---
 
-# Résumé ultra-court par agent
+# Résumé par agent
 
 ## Planner
 Décide **quoi faire** et **dans quel ordre**.
