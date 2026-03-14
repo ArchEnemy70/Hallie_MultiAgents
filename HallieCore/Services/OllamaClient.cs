@@ -353,13 +353,11 @@ namespace Hallie.Services
             prompt = prompt.Replace("{memory}", memory);
             prompt = prompt.Replace("{feedbackContext}", feedbackContext);
 
+            // On injecte juste le prompt CRITIC + La demande utilisateur + l'outil sélectionné et ses paramètres
             var messages = new List<MessageContent>
             {
                 new() { Role = "system", Content = prompt }
             };
-
-            foreach (var msg in history.TakeLast(6))
-                messages.Add(new MessageContent { Role = msg.Role, Content = msg.Content });
 
             messages.Add(new MessageContent
             {
@@ -370,7 +368,7 @@ namespace Hallie.Services
                 Tool call proposé :
                 {JsonSerializer.Serialize(new { tool = toolName, parameters = toolCall.Parameters })}"
             });
-
+            
             var raw = await CallLlmAsync(messages, "Critic Agent");
             var decision = ParseCriticDecision(raw);
             if (decision.Decision == "approve")
@@ -1200,12 +1198,16 @@ namespace Hallie.Services
         {
             LoggerService.LogInfo($"ConversationsService.LoadAll");
 
+            if (!Directory.Exists(Folder))
+                return new List<ChatConversation>(); 
+                
             return Directory.GetFiles(Folder, "*.json")
                             .Select(file => JsonSerializer.Deserialize<ChatConversation>(File.ReadAllText(file)))
                             .Where(c => c != null)
                             //.Where(c => c.Type == type)
                             .Cast<ChatConversation>()
                             .ToList();
+            
         }
 
         public static List<ConversationHistorique> LoadHistoriques()
