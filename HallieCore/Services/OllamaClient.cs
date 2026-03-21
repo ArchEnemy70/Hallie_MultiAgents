@@ -278,7 +278,7 @@ namespace Hallie.Services
                     {userPrompt}"
                 });
 
-            var response = await CallLlmAsync(messages, "Agent spécialiste");
+            var response = await CallLlmAsync(messages, $"Spécialist Agent / {toolName}");
 
             var toolCall = ParseToolCall(response);
             if (toolCall == null)
@@ -484,7 +484,7 @@ namespace Hallie.Services
                     {JsonSerializer.Serialize(input.CompletedSteps)}"
                                 });
 
-            var raw = await CallLlmAsync(messages, "Superviseur global");
+            var raw = await CallLlmAsync(messages, "Supervisor Agent");
             var decision = ParseSupervisorDecision(raw);
             await _agentMemoryStore.AddObservationAsync("supervisor", input.UserPrompt, input.Parameters, input.ResultJson, decision.TechnicalSuccess, decision.TaskSuccess, decision.Why, decision.Decision, input.ExecutionId, input.CompletedSteps.Count);
             return decision;
@@ -663,7 +663,7 @@ namespace Hallie.Services
                 new() { Role = "user", Content = sb.ToString() }
             };
 
-            return await CallLlmAsync(messages, "Final Answer");
+            return await CallLlmAsync(messages, "Synthetizer Agent");
         }
 
         /// <summary>
@@ -724,7 +724,7 @@ namespace Hallie.Services
             foreach (var msg in history) //history.TakeLast(4))
                 messages.Add(new MessageContent { Role = msg.Role, Content = msg.Content });
 
-            var routerRaw = await CallLlmAsync(messages,"Router / Planner");
+            var routerRaw = await CallLlmAsync(messages,"Router / Planner Agent");
             LoggerService.LogDebug($"OllamaClient.CallRouterAsync --> raw.length: {routerRaw.Length}");
 
             var decision = RouterPlanParser.Parse(routerRaw);
@@ -768,7 +768,7 @@ namespace Hallie.Services
         /// </summary>
         private async Task<string> CallLlmAsync(List<MessageContent> messages, string roleAppelant)
         {
-            LoggerService.LogInfo($"OllamaClient.CallLlmAsync >>>>>>>> Appel au modèle : {roleAppelant} <<<<<<<<");
+            LoggerService.LogInfo($"OllamaClient.CallLlmAsync >>>>>>>> Appel au modèle pour {roleAppelant} <<<<<<<<");
 
             try
             {
@@ -1030,6 +1030,7 @@ namespace Hallie.Services
 
             if (input.Contains("[CENSORED]"))
             {
+                LoggerService.LogWarning($"OllamaClient.CleanUserInput --> présence de [CENSORED]");
                 LoggerService.LogDebug($"OllamaClient.CleanUserInput --> Avant :\n{avant}");
                 LoggerService.LogDebug($"OllamaClient.CleanUserInput --> Après :\n{input}");
                 isPromptInjection = true;
