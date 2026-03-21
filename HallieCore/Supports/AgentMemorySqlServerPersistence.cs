@@ -23,6 +23,8 @@ namespace Hallie.Services
 
         public async Task<IReadOnlyList<AgentMemoryEntry>> GetRecentAsync(string agentName, int take = 4, CancellationToken ct = default)
         {
+            LoggerService.LogInfo("SqlServerAgentMemoryPersistence.GetRecentAsync");
+
             if (string.IsNullOrWhiteSpace(agentName))
                 return Array.Empty<AgentMemoryEntry>();
 
@@ -73,13 +75,16 @@ namespace Hallie.Services
                     StepIndex = reader.IsDBNull(11) ? null : reader.GetInt32(11)
                 });
             }
-
+            LoggerService.LogDebug($"SqlServerAgentMemoryPersistence.GetRecentAsync : {rows.Count} lignes");
             rows.Reverse();
             return rows;
         }
 
         public async Task SaveAsync(AgentMemoryEntry entry, CancellationToken ct = default)
         {
+            var agent = entry.AgentName ?? "unknown";
+            LoggerService.LogInfo($"SqlServerAgentMemoryPersistence.SaveAsync : {agent}");
+
             ArgumentNullException.ThrowIfNull(entry);
             await EnsureSchemaAsync(ct);
 
