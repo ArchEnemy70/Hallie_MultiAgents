@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>GtoBC_3D_sans fond.ico</ApplicationIcon>
+    <ApplicationIcon>Allie_fondNoir.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
 	
     <!-- Version logique du produit -->
@@ -59,7 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="GtoBC_3D_sans fond.ico" />
+    <Content Include="Allie_fondNoir.ico" />
   </ItemGroup>
 
   <ItemGroup>
